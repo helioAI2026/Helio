@@ -1,7 +1,12 @@
 [project]
 name = "helio"
 version = "0.1.0"
-description = "Add your description here"
+description = "Detector de sonolência e distrações para automóveis."
 readme = "README.md"
 requires-python = ">=3.14"
-dependencies = []
+dependencies = [
+    "opencv-python",
+    "mediapipe",
+    "scipy",
+    "numpy",
+]
