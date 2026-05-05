@@ -9,9 +9,9 @@ class Drowsiness:
         self.since     = cooldown
 
     def _ear(self, eye):
-        A = distance.euclidean(eye[1], eye[5]) # distancia de p2 a p6 (vertical esquerda do olho)
-        B = distance.euclidean(eye[2], eye[4]) # distancia de p3 a p5 (vertical direita do olho)
-        C = distance.euclidean(eye[0], eye[3]) # distancia de p1 a p4 (horizontal do olho)
+        A = distance.euclidean(eye[1], eye[5]) 
+        B = distance.euclidean(eye[2], eye[4]) 
+        C = distance.euclidean(eye[0], eye[3]) 
 
         if C == 0:
             return 0.0
