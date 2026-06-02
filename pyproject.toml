@@ -9,4 +9,7 @@ dependencies = [
     "mediapipe",
     "scipy",
     "numpy",
+    "boto3",
+    "types-boto3>=1.43.19",
+    "botocore[crt]"
 ]

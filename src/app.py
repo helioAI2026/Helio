@@ -1,4 +1,8 @@
 import config
+from helpers.aws import MQTT
+from helpers.consts import DEVICE_ID, DEVICE_SECRET
+from helpers.ride import Ride
+from models.event import Event
 from src.face_detector import FaceDetector
 from src.sleepiness_detector import SleepinessDetector
 from src.event_logger import EventLogger
@@ -8,6 +12,28 @@ from src.video import Camera, Display
 
 class App:
     def __init__(self):
+        self.ride = Ride(
+            device_id=DEVICE_ID,
+            device_secret=DEVICE_SECRET.encode('utf-8'),
+        )
+
+        ride_id = self.ride.generate_ride_id()
+
+        self.mqtt = MQTT(
+            region='us-east-1',
+            topic='test'
+        )
+
+        test_event = Event(
+            device_id=DEVICE_ID,
+            **ride_id,
+            data=[
+                {"test": "123"}
+            ]
+        )
+
+        self.mqtt.send_payload(test_event)
+
         self.detector = FaceDetector(config.FACE_MODEL)
         self.sleepiness = SleepinessDetector(ear_threshold=config.EAR_THRESHOLD, fps=config.CAMERA_FPS)
         self.logger = EventLogger()
@@ -56,3 +82,8 @@ class App:
         self.camera.release()
         self.display.close()
         print(f"Logs: {self.logger.get_session_file()}")
+
+
+if __name__ == "__main__":
+    app = App()
+    app.run()
