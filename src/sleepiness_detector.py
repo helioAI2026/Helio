@@ -34,7 +34,7 @@ class SleepinessDetector:
         # normaliza PERCLOS: quanto maior o %, maior o score
         perclos_score = max(0, (perclos - self.perclos_threshold) / (0.40 - self.perclos_threshold))
         
-        # Combina EAR (40%) + PERCLOS (60%) para score final (0.0-1.0)
+        # Combina EAR (30%) + PERCLOS (70%) para score final (0.0-1.0)
         score = self.ear_weight * ear_score + self.perclos_weight * perclos_score
         score = min(max(0, score), 1.0)
         
