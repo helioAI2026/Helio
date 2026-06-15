@@ -33,6 +33,6 @@ ALERT_OVERLAY_DURATION_SECONDS = 1  # Tempo para tela ficar vermelha após entra
 ALERT_COOLDOWN_SECONDS = 5  # Intervalo mínimo entre logs de alerta consecutivos (segundos)
 
 # ==================== SOUND ALERT ====================
-SOUND_ALERT_PATH = "alarme.mp3"  # Caminho do arquivo de som
+SOUND_ALERT_PATH = "assets/faaah.mp3"  # Caminho do arquivo de som
 SOUND_ALERT_DELAY_SECONDS = 3    # Tempo em alerta antes de tocar o som (segundos)
 SOUND_ALERT_VOLUME = 0.3         # Volume do alarme (0.0 a 1.0)
