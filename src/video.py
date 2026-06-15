@@ -5,12 +5,13 @@ from src.alert import Alert
 
 
 class Camera:
-    def __init__(self, cam_id, width, height):
+    def __init__(self, cam_id, width, height, fps=30):
         self.cap = cv2.VideoCapture(cam_id)
         if not self.cap.isOpened():
             raise RuntimeError(f"Câmera {cam_id} não disponível")
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+        self.cap.set(cv2.CAP_PROP_FPS, fps)
 
     def read(self):
         ok, frame = self.cap.read()

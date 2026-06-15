@@ -1,3 +1,4 @@
+import time
 import config
 from src.face_detector import FaceDetector
 from src.sleepiness_detector import SleepinessDetector
@@ -12,7 +13,7 @@ class App:
         self.sleepiness = SleepinessDetector(ear_threshold=config.EAR_THRESHOLD, fps=config.CAMERA_FPS)
         self.logger = EventLogger()
         self.alert = Alert()
-        self.camera = Camera(config.CAMERA_ID, config.CAMERA_WIDTH, config.CAMERA_HEIGHT)
+        self.camera = Camera(config.CAMERA_ID, config.CAMERA_WIDTH, config.CAMERA_HEIGHT, config.CAMERA_FPS)
         self.display = Display(config.WINDOW_TITLE, config.WINDOW_WIDTH, config.WINDOW_HEIGHT)
         self._last_alert_frame = 0
         self._alert_cooldown = int(config.CAMERA_FPS * config.ALERT_COOLDOWN_SECONDS)
@@ -22,6 +23,8 @@ class App:
     def run(self):
         frame_count = 0
         was_alert = False
+        last_time = time.monotonic()
+        current_fps = float(config.CAMERA_FPS)
         while self.camera.cap.isOpened():
             frame = self.camera.read()
             if frame is None:
@@ -44,9 +47,15 @@ class App:
                 self._alert_start_frame = None
                 was_alert = False
 
+            now = time.monotonic()
+            elapsed = now - last_time
+            if elapsed > 0:
+                current_fps = 0.9 * current_fps + 0.1 * (1.0 / elapsed)
+            last_time = now
+
             alert_duration = (frame_count - self._alert_start_frame) / config.CAMERA_FPS if self._alert_start_frame is not None else 0.0
             img = self.display.render(frame, left_eye=left, right_eye=right, drowsy=result['alert'], mouth_draw=mouth_draw, yawning=False)
-            self.alert.draw(img, result, alert_duration=alert_duration, overlay_threshold=self._alert_overlay_duration)
+            self.alert.draw(img, result, fps=current_fps, alert_duration=alert_duration, overlay_threshold=self._alert_overlay_duration)
 
             if not self.display.show(img):
                 break

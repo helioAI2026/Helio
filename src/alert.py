@@ -5,7 +5,7 @@ class Alert:
     COLORS = {'NORMAL': (60, 200, 60), 'AVISO': (0, 165, 255), 'ALERTA': (60, 60, 220), 'SEM_FACE': (100, 100, 100)}
     HUD_HEIGHT = 100
 
-    def draw(self, img, result: dict, alert_duration: float = 0.0, overlay_threshold: float = 3.0):
+    def draw(self, img, result: dict, fps: float = 0.0, alert_duration: float = 0.0, overlay_threshold: float = 3.0):
         h, w = img.shape[:2]
         
         if alert_duration > overlay_threshold:
@@ -16,13 +16,19 @@ class Alert:
         cv2.rectangle(img, (0, 0), (w, self.HUD_HEIGHT), (20, 20, 20), -1)
 
         color = self.COLORS.get(result['status'], (100, 100, 100))
+        score_text = f"{result['score']*100:.0f}%"
+        score_w = cv2.getTextSize(score_text, cv2.FONT_HERSHEY_SIMPLEX, 1.0, 2)[0][0]
         cv2.putText(img, result['status'], (12, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, color, 2)
-        cv2.putText(img, f"{result['score']*100:.0f}%", (w - 100, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, color, 2)
-        
+        cv2.putText(img, score_text, (w - 12 - score_w, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, color, 2)
+
         ear_text = f"EAR: {result['ear']:.2f}"
+        fps_text = f"FPS: {fps:.0f}"
         perclos_text = f"PERCLOS: {result['perclos']*100:.0f}%"
+        perclos_w = cv2.getTextSize(perclos_text, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 1)[0][0]
+        fps_text_w = cv2.getTextSize(fps_text, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 1)[0][0]
         cv2.putText(img, ear_text, (12, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (150, 150, 150), 1)
-        cv2.putText(img, perclos_text, (w - 180, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (150, 150, 150), 1)
+        cv2.putText(img, fps_text, (w // 2 - fps_text_w // 2, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (150, 150, 150), 1)
+        cv2.putText(img, perclos_text, (w - 12 - perclos_w, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (150, 150, 150), 1)
 
         bar_w = int((w - 20) * result['score'])
         cv2.rectangle(img, (10, self.HUD_HEIGHT - 15), (10 + bar_w, self.HUD_HEIGHT - 5), color, -1)

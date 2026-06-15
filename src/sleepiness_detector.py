@@ -52,4 +52,3 @@ class SleepinessDetector:
     def reset(self):
         self._perclos_buffer.clear()
         self._ear_history.clear()
-        self._face_lost_frames = 0
