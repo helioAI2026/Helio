@@ -1,31 +1,31 @@
-# Helio — Driver Drowsiness Detection
+# Helio — Detecção de Sonolência ao Volante
 
-Real-time drowsiness detection system for drivers using webcam and facial landmark analysis.
+Sistema de detecção de sonolência em tempo real para motoristas, utilizando webcam e análise de landmarks faciais.
 
-## Overview
+## Visão Geral
 
-Helio monitors the driver's face through a webcam and continuously computes a drowsiness score based on two complementary metrics:
+O Helio monitora o rosto do motorista pela webcam e calcula continuamente um score de sonolência baseado em duas métricas complementares:
 
-- **EAR (Eye Aspect Ratio)** — measures the eye openness ratio frame by frame (fast reaction)
-- **PERCLOS (Percentage of Eye Closure)** — measures the proportion of time eyes remained closed over a 30-second sliding window (robust long-term indicator)
+- **EAR (Eye Aspect Ratio)** — mede a proporção de abertura dos olhos quadro a quadro (reação rápida)
+- **PERCLOS (Percentage of Eye Closure)** — mede o percentual de tempo com os olhos fechados em uma janela deslizante de 30 segundos (indicador robusto de longo prazo)
 
-The final score combines both: `score = 0.3 × EAR_score + 0.7 × PERCLOS_score`
+O score final combina as duas métricas: `score = 0.3 × score_EAR + 0.7 × score_PERCLOS`
 
-### Alert States
+### Estados de Alerta
 
 | Status | Score | Visual |
 |--------|-------|--------|
-| NORMAL | < 30% | Green HUD |
-| AVISO  | 30–60% | Orange HUD |
-| ALERTA | ≥ 60% | Red HUD + red screen overlay + audio alarm |
+| NORMAL | < 30% | HUD verde |
+| AVISO  | 30–60% | HUD laranja |
+| ALERTA | ≥ 60% | HUD vermelho + overlay de tela vermelha + alarme sonoro |
 
-## Requirements
+## Requisitos
 
 - Python 3.14+
 - Webcam
-- [`uv`](https://docs.astral.sh/uv/) (recommended package manager)
+- [`uv`](https://docs.astral.sh/uv/) (gerenciador de pacotes recomendado)
 
-## Installation
+## Instalação
 
 ```bash
 git clone https://github.com/helioAI2026/Helio.git
@@ -33,56 +33,56 @@ cd Helio
 uv sync
 ```
 
-## Usage
+## Uso
 
 ```bash
 uv run python main.py
 ```
 
-Press `Q` to quit.
+Pressione `Q` para sair.
 
-## Configuration
+## Configuração
 
-All parameters are in [config.py](config.py). Key settings:
+Todos os parâmetros estão em [config.py](config.py). Principais configurações:
 
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `EAR_THRESHOLD` | 0.20 | EAR value below which eyes are considered closed |
-| `PERCLOS_WINDOW_SECONDS` | 30 | Sliding window duration for PERCLOS calculation |
-| `PERCLOS_THRESHOLD` | 0.20 | PERCLOS ratio that begins to contribute to the score |
-| `EAR_WEIGHT` / `PERCLOS_WEIGHT` | 0.3 / 0.7 | Score weighting between EAR and PERCLOS |
-| `CAMERA_ID` | 0 | Camera index (0 = default webcam) |
+| Parâmetro | Padrão | Descrição |
+|-----------|--------|-----------|
+| `EAR_THRESHOLD` | 0.20 | Valor de EAR abaixo do qual os olhos são considerados fechados |
+| `PERCLOS_WINDOW_SECONDS` | 30 | Duração da janela deslizante para cálculo do PERCLOS |
+| `PERCLOS_THRESHOLD` | 0.20 | Proporção de PERCLOS que começa a contribuir para o score |
+| `EAR_WEIGHT` / `PERCLOS_WEIGHT` | 0.3 / 0.7 | Pesos do score entre EAR e PERCLOS |
+| `CAMERA_ID` | 0 | Índice da câmera (0 = webcam padrão) |
 
-## Project Structure
+## Estrutura do Projeto
 
 ```
 Helio/
-├── main.py              # Entry point
-├── config.py            # All tunable parameters
+├── main.py              # Ponto de entrada
+├── config.py            # Todos os parâmetros configuráveis
 ├── model/
-│   └── face_landmarker.task  # MediaPipe face landmark model
+│   └── face_landmarker.task  # Modelo de landmarks faciais do MediaPipe
 └── src/
-    ├── app.py               # Main loop and orchestration
-    ├── face_detector.py     # MediaPipe landmark extraction + EAR calculation
-    ├── sleepiness_detector.py  # PERCLOS + score computation
-    ├── alert.py             # HUD rendering and overlay
-    ├── video.py             # Camera capture and display
-    └── event_logger.py      # Session log persistence
+    ├── app.py               # Loop principal e orquestração
+    ├── face_detector.py     # Extração de landmarks via MediaPipe + cálculo do EAR
+    ├── sleepiness_detector.py  # Cálculo do PERCLOS e score de sonolência
+    ├── alert.py             # Renderização do HUD e overlay
+    ├── video.py             # Captura de câmera e exibição
+    └── event_logger.py      # Persistência do log de sessão
 ```
 
-## How It Works
+## Como Funciona
 
-1. Each frame is passed to `FaceDetector`, which uses MediaPipe's Face Landmarker to extract 478 facial landmarks.
-2. Six landmarks per eye are used to compute EAR via the formula: `EAR = (||p2–p6|| + ||p3–p5||) / (2 × ||p1–p4||)`.
-3. `SleepinessDetector` maintains a rolling buffer of EAR values over the configured window and derives PERCLOS.
-4. The weighted score determines the alert state, which `Alert` renders as an on-screen HUD with a progress bar.
-5. Alert events are persisted to a session log file by `EventLogger`.
+1. Cada frame é passado ao `FaceDetector`, que usa o Face Landmarker do MediaPipe para extrair 478 landmarks faciais.
+2. Seis landmarks por olho são usados para calcular o EAR pela fórmula: `EAR = (||p2–p6|| + ||p3–p5||) / (2 × ||p1–p4||)`.
+3. O `SleepinessDetector` mantém um buffer circular de valores de EAR na janela configurada e deriva o PERCLOS.
+4. O score ponderado determina o estado de alerta, que o `Alert` renderiza como HUD com barra de progresso na tela.
+5. Eventos de alerta são persistidos em um arquivo de log de sessão pelo `EventLogger`.
 
-## Dependencies
+## Dependências
 
-| Library | Purpose |
-|---------|---------|
-| `opencv-python` | Camera capture and frame rendering |
-| `mediapipe` | Face landmark detection model |
-| `numpy` | Landmark coordinate math |
-| `scipy` | Signal processing utilities |
+| Biblioteca | Finalidade |
+|------------|------------|
+| `opencv-python` | Captura de câmera e renderização de frames |
+| `mediapipe` | Modelo de detecção de landmarks faciais |
+| `numpy` | Cálculos com coordenadas dos landmarks |
+| `scipy` | Utilitários de processamento de sinais |
