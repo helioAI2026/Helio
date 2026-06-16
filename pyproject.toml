@@ -3,10 +3,20 @@ name = "helio"
 version = "0.1.0"
 description = "Detector de sonolência e distrações para automóveis."
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.9"
 dependencies = [
-    "opencv-python",
-    "mediapipe==0.10.14",
-    "scipy",
-    "numpy",
+    "opencv-python>=4.9.0.80",
+    "tflite-runtime>=2.13.0",
+    "scipy>=1.9",
+    "numpy>=1.23,<2.0",
+]
+
+[project.optional-dependencies]
+# ARM64 Debian 11 (Bullseye, glibc 2.31): use install-arm64.sh
+# which pins opencv-python==4.9.0.80 and tflite-runtime==2.13.0
+arm64 = [
+    "opencv-python==4.9.0.80",
+    "tflite-runtime==2.13.0",
+    "scipy>=1.9",
+    "numpy>=1.23,<2.0",
 ]

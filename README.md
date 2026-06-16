@@ -21,11 +21,14 @@ O score final combina as duas métricas: `score = 0.3 × score_EAR + 0.7 × scor
 
 ## Requisitos
 
-- Python 3.14+
+- Python 3.9+ (veja restrições por plataforma abaixo)
 - Webcam
-- [`uv`](https://docs.astral.sh/uv/) (gerenciador de pacotes recomendado)
+- [`uv`](https://docs.astral.sh/uv/) (gerenciador de pacotes recomendado, para x86_64)
+- `ffmpeg` (para o alerta sonoro)
 
 ## Instalação
+
+### x86_64 (Linux/macOS/Windows) — Python 3.11+
 
 ```bash
 git clone https://github.com/helioAI2026/Helio.git
@@ -33,10 +36,28 @@ cd Helio
 uv sync
 ```
 
+### ARM64 — Debian 11 (Bullseye) — Tinker Board 2S / dispositivos com glibc 2.31
+
+O `tflite-runtime` não oferece wheel para Python 3.11+ no Debian 11 (glibc 2.31). Use o script de instalação dedicado, que cria um virtualenv com Python 3.9 e fixa as versões compatíveis:
+
+```bash
+git clone https://github.com/helioAI2026/Helio.git
+cd Helio
+bash install-arm64.sh
+```
+
 ## Uso
+
+### x86_64
 
 ```bash
 uv run python main.py
+```
+
+### ARM64
+
+```bash
+.venv-arm64/bin/python main.py
 ```
 
 Pressione `Q` para sair.
@@ -60,10 +81,11 @@ Helio/
 ├── main.py              # Ponto de entrada
 ├── config.py            # Todos os parâmetros configuráveis
 ├── model/
-│   └── face_landmarker.task  # Modelo de landmarks faciais do MediaPipe
+│   ├── face_detection.tflite  # Modelo de detecção de face
+│   └── face_landmark.tflite   # Modelo de landmarks faciais
 └── src/
     ├── app.py               # Loop principal e orquestração
-    ├── face_detector.py     # Extração de landmarks via MediaPipe + cálculo do EAR
+    ├── face_detector.py     # Extração de landmarks via TFLite + cálculo do EAR
     ├── sleepiness_detector.py  # Cálculo do PERCLOS e score de sonolência
     ├── alert.py             # Renderização do HUD e overlay
     ├── video.py             # Captura de câmera e exibição
@@ -72,7 +94,7 @@ Helio/
 
 ## Como Funciona
 
-1. Cada frame é passado ao `FaceDetector`, que usa o Face Landmarker do MediaPipe para extrair 478 landmarks faciais.
+1. Cada frame é passado ao `FaceDetector`, que usa dois modelos TFLite (`face_detection.tflite` + `face_landmark.tflite`) para detectar o rosto e extrair landmarks faciais.
 2. Seis landmarks por olho são usados para calcular o EAR pela fórmula: `EAR = (||p2–p6|| + ||p3–p5||) / (2 × ||p1–p4||)`.
 3. O `SleepinessDetector` mantém um buffer circular de valores de EAR na janela configurada e deriva o PERCLOS.
 4. O score ponderado determina o estado de alerta, que o `Alert` renderiza como HUD com barra de progresso na tela.
@@ -83,6 +105,7 @@ Helio/
 | Biblioteca | Finalidade |
 |------------|------------|
 | `opencv-python` | Captura de câmera e renderização de frames |
-| `mediapipe` | Modelo de detecção de landmarks faciais |
+| `tflite-runtime` | Inferência dos modelos de detecção facial e landmarks |
 | `numpy` | Cálculos com coordenadas dos landmarks |
 | `scipy` | Utilitários de processamento de sinais |
+| `ffmpeg` (sistema) | Reprodução do alerta sonoro via `ffplay` |
