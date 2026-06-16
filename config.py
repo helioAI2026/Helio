@@ -13,8 +13,9 @@ WINDOW_HEIGHT = 540  # Altura da janela de exibição (pixels)
 FACE_MODEL = "model/face_landmarker.task"  # Caminho do modelo MediaPipe
 
 # ==================== EAR (Eye Aspect Ratio) ====================
-EAR_THRESHOLD = 0.20  # Limite para considerar olhos fechados (0.0 fechado → 0.4+ aberto)
+EAR_THRESHOLD = 0.25  # Limite para considerar olhos fechados (0.0 fechado → 0.4+ aberto)
 EAR_SMOOTHING_FRAMES = 5  # Janela de suavização EAR (média móvel em N frames)
+BLINK_FRAMES_THRESHOLD = 3  # Se EAR < threshold por ≤ N frames consecutivos, é piscada (não conta no PERCLOS)
 
 # ==================== PERCLOS (Percentage of Eye Closure) ====================
 PERCLOS_THRESHOLD = 0.20  # Limite de PERCLOS (20% = início de alerta)

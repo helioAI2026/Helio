@@ -10,7 +10,7 @@ from src.video import Camera, Display
 class App:
     def __init__(self):
         self.detector = FaceDetector(config.FACE_MODEL)
-        self.sleepiness = SleepinessDetector(ear_threshold=config.EAR_THRESHOLD, fps=config.CAMERA_FPS)
+        self.sleepiness = SleepinessDetector(ear_threshold=config.EAR_THRESHOLD)
         self.logger = EventLogger()
         self.alert = Alert()
         self.camera = Camera(config.CAMERA_ID, config.CAMERA_WIDTH, config.CAMERA_HEIGHT, config.CAMERA_FPS)
@@ -30,7 +30,7 @@ class App:
             if frame is None:
                 break
 
-            left, right, _, mouth_draw = self.detector.detect(frame)
+            left, right = self.detector.detect(frame)
             face_detected = left is not None
             ear = (self.detector._ear(left) + self.detector._ear(right)) / 2.0 if face_detected else 0.0
 
@@ -54,7 +54,7 @@ class App:
             last_time = now
 
             alert_duration = (frame_count - self._alert_start_frame) / config.CAMERA_FPS if self._alert_start_frame is not None else 0.0
-            img = self.display.render(frame, left_eye=left, right_eye=right, drowsy=result['alert'], mouth_draw=mouth_draw, yawning=False)
+            img = self.display.render(frame, left_eye=left, right_eye=right, drowsy=result['alert'])
             self.alert.draw(img, result, fps=current_fps, alert_duration=alert_duration, overlay_threshold=self._alert_overlay_duration)
 
             if not self.display.show(img):
