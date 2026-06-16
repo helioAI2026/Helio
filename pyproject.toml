@@ -6,7 +6,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "opencv-python",
-    "mediapipe",
+    "mediapipe==0.10.14",
     "scipy",
     "numpy",
 ]
