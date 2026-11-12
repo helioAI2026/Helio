@@ -19,7 +19,7 @@ class Alert:
         cv2.putText(img, result['status'], (12, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, color, 2)
         cv2.putText(img, f"{result['score']*100:.0f}%", (w - 100, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, color, 2)
         
-        ear_text = f"EAR: {result['ear']:.2f}"
+        ear_text = f"{result['signal'].upper()}: {result['eye']:.2f}"
         perclos_text = f"PERCLOS: {result['perclos']*100:.0f}%"
         cv2.putText(img, ear_text, (12, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (150, 150, 150), 1)
         cv2.putText(img, perclos_text, (w - 180, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (150, 150, 150), 1)

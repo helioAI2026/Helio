@@ -31,3 +31,7 @@ STATUS_AVISO_THRESHOLD = 0.60  # 0.3 <= Score < 0.60 = AVISO (laranja), Score >=
 # ==================== ALERT BEHAVIOR ====================
 ALERT_OVERLAY_DURATION_SECONDS = 1  # Tempo para tela ficar vermelha após entrar em alerta (segundos)
 ALERT_COOLDOWN_SECONDS = 5  # Intervalo mínimo entre logs de alerta consecutivos (segundos)
+
+# ==================== EYE-STATE MODEL ====================
+DETECTOR = "eyestate"  # "mediapipe" | "eyestate" | "compare"
+P_CLOSED_THRESHOLD = 0.5  # p_closed > 0.5 = olho fechado

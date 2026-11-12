@@ -11,5 +11,13 @@ dependencies = [
     "numpy",
     "boto3",
     "types-boto3>=1.43.19",
-    "botocore[crt]"
+    "botocore[crt]",
+    "onnxruntime>=1.20",
 ]
+
+[dependency-groups]
+dev = ["pytest>=8", "onnx>=1.17"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

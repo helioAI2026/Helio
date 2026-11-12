@@ -13,7 +13,8 @@ class EventLogger:
         event = {
             'timestamp': datetime.now().isoformat(),
             'score': float(round(result['score'], 3)),
-            'ear': float(round(result['ear'], 3)),
+            'signal': result['signal'],
+            'eye': float(round(result['eye'], 3)),
             'perclos': float(round(result['perclos'], 3)),
             'status': result['status'],
         }
