@@ -1,0 +1,20 @@
+[project]
+name = "helio-eyestate-training"
+version = "0.1.0"
+description = "Treino do classificador de estado dos olhos (aberto/fechado) do Helio."
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "torch>=2.5",
+    "onnx>=1.17",
+    "onnxruntime>=1.20",
+    "opencv-python>=4.10",
+    "numpy>=2.0",
+    "scikit-learn>=1.5",
+]
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

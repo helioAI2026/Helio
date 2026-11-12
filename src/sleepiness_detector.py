@@ -1,55 +1,74 @@
 from collections import deque
+from typing import Literal
+
 import config
+
+Signal = Literal["ear", "p_closed"]
 
 
 class SleepinessDetector:
-    def __init__(self, ear_threshold: float = None, fps: float = None, perclos_window: float = None):
-        self.ear_threshold = ear_threshold or config.EAR_THRESHOLD
-        self.perclos_threshold = config.PERCLOS_THRESHOLD
-        self.ear_weight = config.EAR_WEIGHT
-        self.perclos_weight = config.PERCLOS_WEIGHT
-        self.status_normal_threshold = config.STATUS_NORMAL_THRESHOLD
-        self.status_aviso_threshold = config.STATUS_AVISO_THRESHOLD
-        
-        fps = fps or config.CAMERA_FPS
-        perclos_window = perclos_window or config.PERCLOS_WINDOW_SECONDS
-        self.window_frames = int(fps * perclos_window)
-        self._perclos_buffer: deque[bool] = deque(maxlen=self.window_frames)
-        self._ear_history: deque[float] = deque(maxlen=config.EAR_SMOOTHING_FRAMES)
+    """Pontuação de sonolência a partir de um sinal por quadro.
 
-    def compute(self, ear: float, face_detected: bool = True) -> dict:
+    signal="ear":      valor = Eye Aspect Ratio (baixo = olho fechado)
+    signal="p_closed": valor = probabilidade de olho fechado do modelo (alto = fechado)
+
+    O PERCLOS é calculado sobre os últimos `window_seconds` segundos (por tempo,
+    não por número de quadros), então continua correto quando o FPS varia.
+    """
+
+    def __init__(self, signal: Signal, window_seconds: float | None = None):
+        if signal not in ("ear", "p_closed"):
+            raise ValueError(f"Sinal desconhecido: {signal}")
+        self.signal = signal
+        self.window_seconds = window_seconds or config.PERCLOS_WINDOW_SECONDS
+        self._closed: deque[tuple[float, bool]] = deque()
+        self._history: deque[float] = deque(maxlen=config.EAR_SMOOTHING_FRAMES)
+
+    def is_closed(self, v: float) -> bool:
+        if self.signal == "ear":
+            return v < config.EAR_THRESHOLD
+        return v > config.P_CLOSED_THRESHOLD
+
+    def eye_term(self, v: float) -> float:
+        if self.signal == "ear":
+            thr = config.EAR_THRESHOLD
+            return max(0.0, (thr - v) / thr)
+        thr = config.P_CLOSED_THRESHOLD
+        return min(1.0, max(0.0, (v - thr) / (1.0 - thr)))
+
+    def compute(self, value: float, face_detected: bool, t: float) -> dict:
         if not face_detected:
-            return {'score': 0.0, 'alert': False, 'ear': 0.0, 'perclos': 0.0, 'status': 'SEM_FACE'}
+            return {'score': 0.0, 'alert': False, 'eye': 0.0, 'perclos': 0.0,
+                    'status': 'SEM_FACE', 'signal': self.signal}
 
-        # armazena EAR bruto e calcula média móvel
-        self._ear_history.append(ear)
-        smoothed_ear = sum(self._ear_history) / len(self._ear_history)
-        
-        # registra se olhos estão fechados (EAR < threshold) e calcula PERCLOS (% fechamento em 30s)
-        self._perclos_buffer.append(smoothed_ear < self.ear_threshold)
-        perclos = sum(self._perclos_buffer) / len(self._perclos_buffer) if self._perclos_buffer else 0.0
-        
-        # normaliza EAR: quanto menor o valormaior o score (0.0 aberto e 1.0 completamente fechado)
-        ear_score = max(0, (self.ear_threshold - smoothed_ear) / self.ear_threshold)
-        # normaliza PERCLOS: quanto maior o %, maior o score
-        perclos_score = max(0, (perclos - self.perclos_threshold) / (0.40 - self.perclos_threshold))
-        
-        # Combina EAR (40%) + PERCLOS (60%) para score final (0.0-1.0)
-        score = self.ear_weight * ear_score + self.perclos_weight * perclos_score
-        score = min(max(0, score), 1.0)
-        
-        # Classifica status: NORMAL (<30%), AVISO (30-60%), ALERTA (>=60%)
-        status = 'NORMAL' if score < self.status_normal_threshold else ('AVISO' if score < self.status_aviso_threshold else 'ALERTA')
-        
+        self._history.append(value)
+        smoothed = sum(self._history) / len(self._history)
+
+        self._closed.append((t, self.is_closed(smoothed)))
+        while self._closed and self._closed[0][0] < t - self.window_seconds:
+            self._closed.popleft()
+        perclos = sum(c for _, c in self._closed) / len(self._closed)
+
+        perclos_score = max(0.0, (perclos - config.PERCLOS_THRESHOLD) / (0.40 - config.PERCLOS_THRESHOLD))
+        score = config.EAR_WEIGHT * self.eye_term(smoothed) + config.PERCLOS_WEIGHT * perclos_score
+        score = min(max(0.0, score), 1.0)
+
+        if score < config.STATUS_NORMAL_THRESHOLD:
+            status = 'NORMAL'
+        elif score < config.STATUS_AVISO_THRESHOLD:
+            status = 'AVISO'
+        else:
+            status = 'ALERTA'
+
         return {
             'score': score,
-            'alert': score >= 0.60,
-            'ear': smoothed_ear,
+            'alert': score >= config.STATUS_AVISO_THRESHOLD,
+            'eye': smoothed,
             'perclos': perclos,
             'status': status,
+            'signal': self.signal,
         }
 
     def reset(self):
-        self._perclos_buffer.clear()
-        self._ear_history.clear()
-        self._face_lost_frames = 0
+        self._closed.clear()
+        self._history.clear()

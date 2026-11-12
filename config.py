@@ -1,5 +1,7 @@
+import os
+
 # ==================== CAMERA SETTINGS ====================
-CAMERA_ID = 0  # ID da câmera (0 = câmera padrão)
+CAMERA_ID = int(os.environ.get("HELIO_CAMERA", "0"))  # ID da câmera; HELIO_CAMERA=1 escolhe outra (ex.: iPhone x Mac)
 CAMERA_WIDTH = 640  # Largura de captura (pixels)
 CAMERA_HEIGHT = 480  # Altura de captura (pixels)
 CAMERA_FPS = 30  # Taxa de quadros (frames por segundo)
@@ -31,3 +33,11 @@ STATUS_AVISO_THRESHOLD = 0.60  # 0.3 <= Score < 0.60 = AVISO (laranja), Score >=
 # ==================== ALERT BEHAVIOR ====================
 ALERT_OVERLAY_DURATION_SECONDS = 1  # Tempo para tela ficar vermelha após entrar em alerta (segundos)
 ALERT_COOLDOWN_SECONDS = 5  # Intervalo mínimo entre logs de alerta consecutivos (segundos)
+
+# ==================== EYE-STATE MODEL ====================
+DETECTOR = "eyestate"  # "mediapipe" | "eyestate" | "compare"
+P_CLOSED_THRESHOLD = 0.5  # p_closed > 0.5 = olho fechado
+YUNET_MODEL = "model/face_detection_yunet_2023mar.onnx"  # baixe com scripts/download_models.py
+EYE_STATE_MODEL = "model/eye_state.onnx"  # gerado por training: python -m eyestate.export
+EYE_CROP_SCALE = 0.6  # lado do recorte do olho = 0.6 × distância entre os olhos
+MIN_EYE_DISTANCE_PX = 12  # rosto menor que isso é ignorado

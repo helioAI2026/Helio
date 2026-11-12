@@ -5,7 +5,8 @@ class Alert:
     COLORS = {'NORMAL': (60, 200, 60), 'AVISO': (0, 165, 255), 'ALERTA': (60, 60, 220), 'SEM_FACE': (100, 100, 100)}
     HUD_HEIGHT = 100
 
-    def draw(self, img, result: dict, alert_duration: float = 0.0, overlay_threshold: float = 3.0):
+    def draw(self, img, result: dict, alert_duration: float = 0.0, overlay_threshold: float = 3.0,
+             secondary: dict | None = None, fps: float | None = None):
         h, w = img.shape[:2]
         
         if alert_duration > overlay_threshold:
@@ -19,11 +20,18 @@ class Alert:
         cv2.putText(img, result['status'], (12, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, color, 2)
         cv2.putText(img, f"{result['score']*100:.0f}%", (w - 100, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, color, 2)
         
-        ear_text = f"EAR: {result['ear']:.2f}"
+        ear_text = f"{result['signal'].upper()}: {result['eye']:.2f}"
         perclos_text = f"PERCLOS: {result['perclos']*100:.0f}%"
         cv2.putText(img, ear_text, (12, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (150, 150, 150), 1)
         cv2.putText(img, perclos_text, (w - 180, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (150, 150, 150), 1)
 
         bar_w = int((w - 20) * result['score'])
         cv2.rectangle(img, (10, self.HUD_HEIGHT - 15), (10 + bar_w, self.HUD_HEIGHT - 5), color, -1)
+        if secondary is not None:
+            sec_color = self.COLORS.get(secondary['status'], (100, 100, 100))
+            sec_text = (f"MODELO: {secondary['status']} {secondary['score']*100:.0f}%  "
+                        f"P_FECHADO: {secondary['eye']:.2f}  PERCLOS: {secondary['perclos']*100:.0f}%")
+            cv2.putText(img, sec_text, (12, 78), cv2.FONT_HERSHEY_SIMPLEX, 0.5, sec_color, 1)
+        if fps is not None:
+            cv2.putText(img, f"FPS: {fps:.0f}", (w - 90, h - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (150, 150, 150), 1)
         cv2.putText(img, "Q: sair", (10, h - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (100, 100, 100), 1)
