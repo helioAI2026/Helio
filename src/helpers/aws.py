@@ -2,7 +2,7 @@ import json
 
 import boto3
 
-from models.event import Event
+from src.models.event import Event
 
 
 class MQTT:

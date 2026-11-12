@@ -29,7 +29,8 @@ class Display:
         self.title = title
         self.hud_h = Alert.HUD_HEIGHT
 
-    def render(self, frame, left_eye, right_eye, drowsy, mouth_draw=None, yawning=False):
+    def render(self, frame, left_eye, right_eye, drowsy, mouth_draw=None, yawning=False,
+               eye_boxes=(None, None), boxes_drowsy=False):
         img = cv2.cvtColor((frame * 255).astype(np.uint8), cv2.COLOR_RGB2BGR)
 
         eye_color = (60, 60, 220) if drowsy else (60, 200, 60)
@@ -51,6 +52,11 @@ class Display:
                 for pts in (upper, lower):
                     for p in pts:
                         cv2.circle(img, tuple(p), 2, mouth_color, -1, cv2.LINE_AA)
+
+        box_color = (60, 60, 220) if boxes_drowsy else (60, 200, 60)
+        for b in eye_boxes:
+            if b is not None and b[1] > self.hud_h:
+                cv2.rectangle(img, (b[0], b[1]), (b[2], b[3]), box_color, 1, cv2.LINE_AA)
 
         return img
 
