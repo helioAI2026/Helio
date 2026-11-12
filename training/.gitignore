@@ -3,3 +3,4 @@ checkpoints/
 .venv/
 __pycache__/
 *.log
+results/
