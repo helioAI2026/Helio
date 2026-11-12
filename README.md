@@ -46,15 +46,14 @@ ONNX opset 13 (convertível para TensorRT no Jetson Nano).
 
 ## Status (2026-11-12)
 
-Pipeline construído e testado (`uv run pytest` no edge e em `training/`), mas as metas acima
-**ainda não foram verificadas**:
+Pipeline construído e testado (`uv run pytest` no edge e em `training/`). Metas:
 
-- [ ] treino real no MRL (o download foi bloqueado pela rede; baixe o zip manualmente)
-- [ ] ≥ 95% nos sujeitos de teste do MRL
+- [x] treino real no MRL (15 épocas, ~3 min no M4/MPS; modelo ONNX de 311 KB, opset 13)
+- [x] ≥ 95% nos sujeitos de teste do MRL — **96,0%** (ROC-AUC 0,996; 6 pessoas, 10.392 imagens).
+  Erro mais comum: olho aberto classificado como fechado (364 de 3.872 abertos)
 - [ ] ≥ 90% no clipe da webcam (`record_eval`)
 - [ ] ≥ 30 FPS na webcam (medido 120 FPS do pipeline sem câmera, com pesos não treinados)
 
-Até existir `model/eye_state.onnx`, o modo `eyestate` encerra com uma mensagem explicando como
-gerá-lo; use `DETECTOR = "mediapipe"` enquanto isso.
+`model/eye_state.onnx` não vai para o git: gere-o com os comandos de treino acima.
 
 Design: `docs/superpowers/specs/2026-11-12-eye-state-model-design.md`.
