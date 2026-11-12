@@ -35,8 +35,9 @@ class EyeStatePipeline:
     """Camera frame (RGB float [0,1]) -> face -> eye crops -> p_closed."""
 
     def __init__(self, yunet_path: str, classifier_path: str):
-        _require(yunet_path, "scripts/download_models.py")
-        _require(classifier_path, "training: python -m eyestate.export")
+        _require(yunet_path, "uv run python scripts/download_models.py")
+        _require(classifier_path, "cd training && uv run python -m eyestate.train && uv run python -m eyestate.export "
+                                  "(veja o README), ou use DETECTOR = \"mediapipe\" em config.py")
         self.detector = YuNet(yunet_path)
         self.classifier = EyeStateClassifier(classifier_path)
 

@@ -56,3 +56,11 @@ def test_eyestate_mode_does_not_import_mediapipe(tmp_path):
                        env={"HELIO_OFFLINE": "1", "PYTHONPATH": str(ROOT), "PATH": "/usr/bin:/bin"})
     assert r.returncode == 0, r.stderr
     assert r.stdout.strip().splitlines()[-1] == "False"
+
+
+def test_main_missing_model_exits_cleanly(tmp_path):
+    r = subprocess.run([sys.executable, str(ROOT / "main.py")], cwd=tmp_path, capture_output=True, text=True,
+                       env={"HELIO_OFFLINE": "1", "PYTHONPATH": str(ROOT), "PATH": "/usr/bin:/bin"})
+    assert r.returncode != 0
+    assert "Modelo não encontrado" in r.stderr
+    assert "Traceback" not in r.stderr

@@ -90,3 +90,10 @@ def test_missing_model_message(tiny_onnx, tmp_path):
         pl.EyeStatePipeline(str(tmp_path / "nope.onnx"), str(tiny_onnx))
     with pytest.raises(pl.ModelMissingError, match="eyestate.export"):
         pl.EyeStatePipeline(str(tiny_onnx), str(tmp_path / "nope.onnx"))
+
+
+def test_missing_classifier_hint_says_train_then_export(tiny_onnx, tmp_path):
+    with pytest.raises(pl.ModelMissingError) as e:
+        pl.EyeStatePipeline(str(tiny_onnx), str(tmp_path / "nope.onnx"))
+    msg = str(e.value)
+    assert "cd training" in msg and "eyestate.train" in msg and "eyestate.export" in msg

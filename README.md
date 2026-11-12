@@ -44,4 +44,17 @@ uv run python -m eyestate.evaluate --onnx ../model/eye_state.onnx --checkpoint c
 Metas: ≥ 95% de acurácia nas pessoas de teste do MRL, ≥ 90% no clipe da webcam, modelo < 1 MB,
 ONNX opset 13 (convertível para TensorRT no Jetson Nano).
 
+## Status (2026-11-12)
+
+Pipeline construído e testado (`uv run pytest` no edge e em `training/`), mas as metas acima
+**ainda não foram verificadas**:
+
+- [ ] treino real no MRL (o download foi bloqueado pela rede; baixe o zip manualmente)
+- [ ] ≥ 95% nos sujeitos de teste do MRL
+- [ ] ≥ 90% no clipe da webcam (`record_eval`)
+- [ ] ≥ 30 FPS na webcam (medido 120 FPS do pipeline sem câmera, com pesos não treinados)
+
+Até existir `model/eye_state.onnx`, o modo `eyestate` encerra com uma mensagem explicando como
+gerá-lo; use `DETECTOR = "mediapipe"` enquanto isso.
+
 Design: `docs/superpowers/specs/2026-11-12-eye-state-model-design.md`.
