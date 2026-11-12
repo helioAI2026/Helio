@@ -31,6 +31,13 @@ def main() -> None:
                 f"Falha ao baixar ({e}).\nBaixe manualmente {URL} e salve em {zip_path}, depois rode de novo."
             )
 
+    if not zipfile.is_zipfile(zip_path):
+        zip_path.unlink()
+        sys.exit(
+            f"O arquivo baixado de {URL} não é um zip (a rede pode estar bloqueando o download).\n"
+            f"Baixe manualmente e salve em {zip_path}, depois rode de novo."
+        )
+
     print(f"Descompactando em {out} ...")
     with zipfile.ZipFile(zip_path) as z:
         z.extractall(out)
