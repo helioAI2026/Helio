@@ -35,3 +35,7 @@ ALERT_COOLDOWN_SECONDS = 5  # Intervalo mínimo entre logs de alerta consecutivo
 # ==================== EYE-STATE MODEL ====================
 DETECTOR = "eyestate"  # "mediapipe" | "eyestate" | "compare"
 P_CLOSED_THRESHOLD = 0.5  # p_closed > 0.5 = olho fechado
+YUNET_MODEL = "model/face_detection_yunet_2023mar.onnx"  # baixe com scripts/download_models.py
+EYE_STATE_MODEL = "model/eye_state.onnx"  # gerado por training: python -m eyestate.export
+EYE_CROP_SCALE = 0.6  # lado do recorte do olho = 0.6 × distância entre os olhos
+MIN_EYE_DISTANCE_PX = 12  # rosto menor que isso é ignorado
