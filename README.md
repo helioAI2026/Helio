@@ -14,6 +14,7 @@ Detector de sonolência que roda no dispositivo (hoje no MacBook; depois no Jets
 uv sync
 uv run python scripts/download_models.py   # YuNet → model/
 HELIO_OFFLINE=1 uv run main.py              # sem AWS/MQTT; "q" sai
+HELIO_CAMERA=1 HELIO_OFFLINE=1 uv run main.py   # outra câmera (ex.: Mac em vez do iPhone)
 uv run pytest
 ```
 

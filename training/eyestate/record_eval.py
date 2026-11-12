@@ -9,6 +9,7 @@ mesmo recorte do app (YuNet + geometry), para medir o modelo nas mesmas condiÃ§Ã
 """
 
 import argparse
+import os
 import sys
 from pathlib import Path
 
@@ -30,7 +31,7 @@ def save_crop(crop: np.ndarray, out: Path, label: str) -> Path:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", type=Path, default=Path("data/live"))
-    ap.add_argument("--camera", type=int, default=0)
+    ap.add_argument("--camera", type=int, default=int(os.environ.get("HELIO_CAMERA", "0")))
     a = ap.parse_args()
 
     sys.path.insert(0, str(EDGE_ROOT))

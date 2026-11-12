@@ -1,5 +1,7 @@
+import os
+
 # ==================== CAMERA SETTINGS ====================
-CAMERA_ID = 0  # ID da câmera (0 = câmera padrão)
+CAMERA_ID = int(os.environ.get("HELIO_CAMERA", "0"))  # ID da câmera; HELIO_CAMERA=1 escolhe outra (ex.: iPhone x Mac)
 CAMERA_WIDTH = 640  # Largura de captura (pixels)
 CAMERA_HEIGHT = 480  # Altura de captura (pixels)
 CAMERA_FPS = 30  # Taxa de quadros (frames por segundo)
