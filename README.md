@@ -47,7 +47,7 @@ ONNX opset 13 (convertível para TensorRT no Jetson Nano).
 
 ## Status (2026-11-12)
 
-Pipeline construído e testado (`uv run pytest` no edge e em `training/`). Metas:
+Pipeline construído e testado (`uv run pytest` no edge e em `training/`). Todas as metas foram atingidas:
 
 - [x] treino real no MRL (15 épocas, ~3 min no M4/MPS; modelo ONNX de 311 KB, opset 13)
 - [x] ≥ 95% nos sujeitos de teste do MRL — **96,0%** (ROC-AUC 0,996; 6 pessoas, 10.392 imagens).
@@ -55,7 +55,8 @@ Pipeline construído e testado (`uv run pytest` no edge e em `training/`). Metas
 - [x] ≥ 90% no clipe da webcam (`record_eval`) — **92,2%** (1.140 recortes, 1 pessoa, câmera do Mac).
   Aqui o erro mais comum é o inverso: olho fechado lido como aberto (75 de 478), por causa da
   diferença entre webcam colorida e o infravermelho do MRL. Limiar mantido em 0,5
-- [ ] ≥ 30 FPS na webcam (medido 120 FPS do pipeline sem câmera, com pesos não treinados)
+- [x] ≥ 30 FPS na webcam — **30 FPS** (limite da câmera; o pipeline sozinho roda a ~120 FPS) e o
+  status chega a ALERTA com os olhos fechados por ~10 s
 
 `model/eye_state.onnx` não vai para o git: gere-o com os comandos de treino acima.
 
